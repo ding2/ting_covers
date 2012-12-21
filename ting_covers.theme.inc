@@ -12,9 +12,9 @@ function template_preprocess_ting_object_cover(&$variables) {
 
   //If we already have the image available locally then just use it
   $path = ting_covers_object_path($object->localId);
-  if (file_exists($path)) {
-    //Generate an alt tag
+  //Generate an alt tag
     $alt = implode(', ', $object->creators).': '.$object->title;
+  if (file_exists($path)) {
 
     $variables['image'] = theme('image_style', array('style_name' => $variables['image_style'], 'path' => $path, 'alt' => $alt));
 
@@ -24,6 +24,8 @@ function template_preprocess_ting_object_cover(&$variables) {
     //We know that there is no cover available for this object so avoid
     //further javascript processing
     $variables['classes'][] = 'ting-cover-processed';
+    // $variables['image'] = theme('image_style', array('style_name' => $variables['image_style'], 'path' => 'public://manual/DEFAULT_COVER_IMAGE.jpg', 'alt' => $alt));
+    
   }
 }
 

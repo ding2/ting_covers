@@ -57,9 +57,8 @@ class AdditionalInformationService {
                       'authenticationGroup' => $this->group,
                       'authenticationPassword' => $this->password);
     $client = new SoapClient($this->wsdlUrl);
-    
-    $startTime = explode(' ', microtime()); 
-    $response = $client->additionalInformation(array(
+    $startTime = explode(' ', microtime());
+    $response = $client->moreInfo(array(
                           'authentication' => $authInfo,
                           'identifier' => $identifiers));
     
@@ -75,7 +74,7 @@ class AdditionalInformationService {
     {
       throw new AdditionalInformationServiceException($response->requestStatus->statusEnum.': '.$response->requestStatus->errorText);
     }
-        
+    
     if (!is_array($response->identifierInformation))
     {
       $response->identifierInformation = array($response->identifierInformation); 
@@ -91,26 +90,26 @@ class AdditionalInformationService {
     foreach($response->identifierInformation as $info)
     {
       $thumbnailUrl = $detailUrl = NULL;
-      if (isset($info->identifierKnown) && $info->identifierKnown && $info->image )
+      if (isset($info->identifierKnown) && $info->identifierKnown && $info->coverImage )
       {
-        if (!is_array($info->image))
+        if (!is_array($info->coverImage))
         {
-          $info->image = array($info->image);
+          $info->coverImage = array($info->coverImage);
         }
-        
-        foreach ($info->image as $image)
+
+        foreach ($info->coverImage as $image)
         {
           switch ($image->imageSize) {
             case 'thumbnail':
-              $thumbnailUrl = $image->_; 
+              $thumbnailUrl = $image->_;
               break;
             case 'detail':
-              $detailUrl = $image->_; 
+              $detailUrl = $image->_;
               break;
             default:
-            	// Do nothing other image sizes may appear but ignore them for now
+                // Do nothing other image sizes may appear but ignore them for now
           }
-        }     
+        }    
   
         $additionalInfo = new AdditionalInformation($thumbnailUrl, $detailUrl);
         $additionalInformations[$info->identifier->$idName] = $additionalInfo;

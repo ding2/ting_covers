@@ -25,6 +25,10 @@
       $('.ting-cover:not(.ting-cover-processing, .ting-cover-processed)', context).each(function(i, e) {
         coverData.push(Drupal.extractCoverData(e));
       }).addClass('ting-cover-processing');
+      
+      // $('.ting-cover', context).each(function(i, e) {
+        // coverData.push(Drupal.extractCoverData(e));
+      // }).addClass('ting-cover-processing');
 
       if (coverData.length > 0) {
         //Retrieve covers
