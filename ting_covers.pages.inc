@@ -5,7 +5,7 @@
  */
 function ting_covers_objects() {
   $covers = array();
-  $missing_images_local_ids = array();
+  $missing_images = $missing_images_local_ids = array();
 
   foreach ($_POST['coverData'] as $cover_info) {
     //Reverse cover_info before and after explode to make sure that we explode around
@@ -24,6 +24,10 @@ function ting_covers_objects() {
     } else {
       //Mark the image for retrieval;
       $missing_images_local_ids[] = $local_id;
+      if (!isset($missing_images['i_' . $local_id])) {
+        $missing_images['i_' . $local_id] = array();
+      }
+      $missing_images['i_' . $local_id][$image_style] = TRUE;
     }
   }
 
@@ -45,6 +49,9 @@ function ting_covers_objects() {
 
       //No cover image found? Cache this for future reference to avoid unnecessary requests
       if (!$source_url) {
+        // foreach ($missing_images['i_' . $local_id] as $image_style => $holder) {
+          // $covers[$local_id.':'.$image_style] = image_style_url($image_style, 'public://manual/DEFAULT_COVER_IMAGE.jpg');
+        // }
         cache_set('ting_covers:'.$local_id, 1, 'cache', $_SERVER['REQUEST_TIME'] + TING_COVERS_CACHE_LIFETIME);
         continue;
       }
@@ -52,7 +59,9 @@ function ting_covers_objects() {
       //Try to download the image locally
       if ($file = _ting_covers_pages_fetch_image(ting_covers_object_path($local_id), $source_url)) {
         //Generate a path corresponding to the downloaded image, styled
-        $covers[$local_id.':'.$image_style] = image_style_url($image_style, $file->uri);
+        foreach ($missing_images['i_' . $local_id] as $image_style => $holder) {
+          $covers[$local_id.':'.$image_style] = image_style_url($image_style, $file->uri);
+        }
       }
     }
   } catch (Exception $e) {
